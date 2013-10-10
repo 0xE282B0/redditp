@@ -44,10 +44,14 @@ a:hover {
     color: #f99;
 }
 
+.album {
+	border: solid thin gray;
+}
+
 .navbox ul li a {
     cursor:pointer;
     }
-.numberButtonList ul li a:hover { background:#888; color:#000; border: 0; }
+.numberButtonList ul li a:hover { background:#888; color:#000; }
 .numberButtonList ul li a.active:hover {
     color:  #00f;
     cursor: default;
@@ -122,6 +126,41 @@ label.checkbox { font-weight: bold; }
     cursor: hand; cursor: pointer;
 }
 
+.upArrow {
+	display: none;
+	
+    position: absolute;
+    left: 75%;
+    top: 10px;
+    width: 0; 
+    height: 0; 
+    
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent; 
+    border-bottom: 30px solid white; 
+
+    opacity: 0.8;
+    
+    cursor: hand; cursor: pointer;
+}
+
+.downArrow {
+	display: none;
+	
+    position: absolute;
+    left: 75%;
+    bottom: 10px;
+    width: 0; 
+    height: 0; 
+    
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent; 
+    border-top: 30px solid white; 
+
+    opacity: 0.8;
+    
+    cursor: hand; cursor: pointer;
+}
 
 /*
                                 __      _ _                   _   
