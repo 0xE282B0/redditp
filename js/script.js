@@ -111,11 +111,18 @@ $(function () {
     }
 
 	function nextAlbumSlide() {
-		alert("not implemented.");
+		var p = photos[activeIndex];
+		if((p.index + 1) === p.album.length)
+			return nextSlide();
+		slideBackgroundPhoto(p.next());
+		
 	}
 	
 	function prevAlbumSlide() {		
-		alert("not implemented.");
+		var p = photos[activeIndex];
+		if(p.index === 0)
+			return prevSlide();
+		slideBackgroundPhoto(p.prev());
 	}
 	
     var autoNextSlide = function () {
@@ -134,10 +141,10 @@ $(function () {
             prevSlide();
         },
         wipeUp: function () {
-            nextSlide();
+            nextAlbumSlide();
         },
         wipeDown: function () {
-            prevSlide();
+            prevAlbumSlide();
         },
         min_move_x: 20,
         min_move_y: 20,
@@ -272,6 +279,7 @@ $(function () {
     var addAlbumSlide = function (url, title, commentsLink, over18) {
     	//Placeholder
     	var pic = {
+    			"index": 0,
                 "title": title,
                 "cssclass": "clouds",
                 "image": url,
@@ -281,6 +289,15 @@ $(function () {
                 "commentsLink": commentsLink,
                 "over18": over18
             }
+    	pic.next = function(){
+    		this.image = this.album[++this.index].link;
+    		return this;
+    	};
+
+    	pic.prev = function(){
+    		this.image = this.album[--this.index].link; 		
+    		return this;
+    	};
     	
     	// get album ID
 		var albumID = url.match(/.*\/(.+?$)/)[1];
@@ -402,13 +419,20 @@ $(function () {
                 $("#autoNextSlide").prop("checked", !$("#autoNextSlide").is(':checked'));
                 updateAutoNext();
                 break;
+            case arrow.up: //Album prev
+            	if(Array.isArray(photos[activeIndex].album)){
+            		return prevAlbumSlide();
+            	}
             case PAGEUP:
             case arrow.left:
-            case arrow.up: //Album prev
                 return prevSlide()
+            case arrow.down://Album next
+            	if(Array.isArray(photos[activeIndex].album)){
+            		return nextAlbumSlide();
+            	}
             case PAGEDOWN:
             case arrow.right:
-            case arrow.down://Album next
+
             case SPACE:
                 return nextSlide()
         }
@@ -458,8 +482,7 @@ $(function () {
 
         isAnimating = true;
         animateNavigationBox(imageIndex);
-        slideBackgroundPhoto(imageIndex);
-		albumArrows(Array.isArray(photos[imageIndex].album));
+        slideBackgroundPhoto(photos[imageIndex]);
 
         // Set the active index to the used image index
         activeIndex = imageIndex;
@@ -469,10 +492,17 @@ $(function () {
         }
     };
 
-	var albumArrows = function(enable) {
+	var albumArrows = function(enable,photo) {
 		if (enable) {
-//			$('#upButton').show();
-			$('#downButton').show();
+			var p = photo;
+			if(p.index === 0)
+				$('#upButton').hide();
+			else
+				$('#upButton').show();				
+			if((p.index + 1) === p.album.length)
+				$('#downButton').hide();
+			else
+				$('#downButton').show();
 		} else {
 			$('#upButton').hide();
 			$('#downButton').hide();
@@ -499,7 +529,10 @@ $(function () {
     var animateNavigationBox = function (imageIndex) {
         var photo = photos[imageIndex];
 
-        $('#navboxTitle').html(photo.title);
+        if(Array.isArray(photo.album))
+        	$('#navboxTitle').html(photo.title+"["+(photo.index+1)+"/"+photo.album.length+"]");
+        else
+        	$('#navboxTitle').html(photo.title);
         $('#navboxLink').attr('href', photo.url).attr('title', photo.title);
         $('#navboxCommentsLink').attr('href', photo.commentsLink).attr('title', "Comments on reddit");
 
@@ -510,11 +543,16 @@ $(function () {
     //
     // Slides the background photos
     //
-    var slideBackgroundPhoto = function (imageIndex) {
+    var slideBackgroundPhoto = function (photo) {
 
+//    	log(photo);
         // Retrieve the accompanying photo based on the index
-        var photo = photos[imageIndex];
+        //var photo = photos[imageIndex];
 
+    	albumArrows(Array.isArray(photo.album),photo);
+        if(Array.isArray(photo.album))
+        	$('#navboxTitle').html(photo.title+"["+(photo.index+1)+"/"+photo.album.length+"]");
+    	
         // Create a new div and apply the CSS
         var cssMap = Object();
         cssMap['display'] = "none";
